@@ -6,7 +6,7 @@ class SalesController {
     private $cfg;
 
     public function __construct() {
-        $cfg = include __DIR__.'/../../../config/config.php';
+        $this->cfg = include __DIR__.'/../../../config/config.php';
         $dsn = "mysql:host={$this->cfg['db']['host']};dbname={$this->cfg['db']['dbname']};charset=utf8mb4";
         $this->pdo = new PDO($dsn, $this->cfg['db']['user'], $this->cfg['db']['pass'], [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
@@ -77,4 +77,5 @@ if($sale['senior']) $html .= "<div>Senior/PWD Discount Applied</div>";
 $html .= "</body></html>";
 file_put_contents($path, $html);
 }
+
 }

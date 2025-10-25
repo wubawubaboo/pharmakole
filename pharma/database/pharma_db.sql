@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 20, 2025 at 05:00 PM
+-- Generation Time: Oct 25, 2025 at 03:59 AM
 -- Server version: 8.0.41
 -- PHP Version: 8.2.12
 
@@ -35,16 +35,6 @@ CREATE TABLE `activity_logs` (
   `created_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Dumping data for table `activity_logs`
---
-
-INSERT INTO `activity_logs` (`id`, `username`, `action`, `details`, `created_at`) VALUES
-(1, 'hoho', 'login_success', 'User logged in successfully.', '2025-10-20 21:55:14'),
-(2, 'Cashier 1', 'create_sale', 'Created Sale ID: 16 (Total: 13.44)', '2025-10-20 21:55:38'),
-(3, 'Cashier 1', 'create_sale', 'Created Sale ID: 17 (Total: 13.44)', '2025-10-20 22:42:22'),
-(4, 'hoho', 'login_success', 'User logged in successfully.', '2025-10-20 22:52:19');
-
 -- --------------------------------------------------------
 
 --
@@ -69,7 +59,7 @@ CREATE TABLE `products` (
 
 INSERT INTO `products` (`id`, `name`, `category`, `quantity`, `unit_price`, `purchase_price`, `supplier`, `expiry_date`, `created_at`) VALUES
 (1, 'Biogesic (Paracetamol) 500mg Tablet', 'Pain Relief', 200, 5.50, 4.00, 'Unilab, Inc.', '2027-12-31', '2025-10-16 14:58:48'),
-(2, 'Advil (Ibuprofen) 200mg Capsule', 'Pain Relief', 243, 12.00, 9.50, 'Pfizer', '2026-10-31', '2025-10-16 14:58:48'),
+(2, 'Advil (Ibuprofen) 200mg Capsule', 'Pain Relief', 236, 12.00, 9.50, 'Pfizer', '2026-10-31', '2025-10-16 14:58:48'),
 (3, 'Saridon Triple Action Tablet', 'Pain Relief', 243, 7.00, 5.25, 'Bayer', '2027-08-31', '2025-10-16 14:58:48'),
 (4, 'Tempra Forte (Paracetamol) 250mg/5ml Syrup 60ml', 'Fever Relief', 80, 135.00, 110.00, 'Taisho', '2026-05-31', '2025-10-16 14:58:48'),
 (5, 'Solmux Forte (Carbocisteine) 500mg Capsule', 'Cough & Cold', 120, 15.00, 12.50, 'Unilab, Inc.', '2027-11-30', '2025-10-16 14:58:48'),
@@ -79,7 +69,7 @@ INSERT INTO `products` (`id`, `name`, `category`, `quantity`, `unit_price`, `pur
 (9, 'Enervon C Tablet', 'Vitamins', 399, 7.50, 6.00, 'Unilab, Inc.', '2027-07-31', '2025-10-16 14:58:48'),
 (10, 'Centrum Advance Multivitamins', 'Vitamins', 75, 18.00, 15.00, 'GSK', '2026-11-30', '2025-10-16 14:58:48'),
 (11, 'Fern-C (Sodium Ascorbate) 500mg Capsule', 'Vitamins', 500, 9.00, 7.20, 'Fern, Inc.', '2027-04-30', '2025-10-16 14:58:48'),
-(12, 'Appebon with Iron Capsule', 'Supplements', 120, 11.00, 9.00, 'Unilab, Inc.', '2026-08-31', '2025-10-16 14:58:48'),
+(12, 'Appebon with Iron Capsule', 'Supplements', 119, 11.00, 9.00, 'Unilab, Inc.', '2026-08-31', '2025-10-16 14:58:48'),
 (13, 'Betadine Antiseptic Solution 60ml', 'First Aid', 60, 150.00, 125.00, 'Mundipharma', '2028-02-29', '2025-10-16 14:58:48'),
 (14, 'Band-Aid Assorted Strips (20s)', 'First Aid', 92, 45.00, 35.00, 'Johnson & Johnson', '2029-01-31', '2025-10-16 14:58:48'),
 (15, 'Green Cross Isopropyl Alcohol 70% 250ml', 'First Aid', 110, 55.00, 45.00, 'Green Cross, Inc.', '2028-12-31', '2025-10-16 14:58:48'),
@@ -107,29 +97,6 @@ CREATE TABLE `sales` (
   `created_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Dumping data for table `sales`
---
-
-INSERT INTO `sales` (`id`, `cashier_name`, `total_amount`, `tax_amount`, `discount_amount`, `senior_pwd`, `created_at`) VALUES
-(1, 'Cashier 1', 62.72, 6.72, 0.00, 0, '2025-10-16 19:52:49'),
-(2, 'Cashier 1', 62.72, 6.72, 0.00, 0, '2025-10-16 19:54:02'),
-(3, 'Cashier 1', 62.72, 6.72, 0.00, 0, '2025-10-16 19:57:31'),
-(4, 'Cashier 1', 62.72, 6.72, 0.00, 0, '2025-10-16 20:05:03'),
-(5, 'Cashier 1', 62.72, 6.72, 0.00, 0, '2025-10-16 20:05:12'),
-(6, 'Cashier 1', 62.72, 6.72, 0.00, 0, '2025-10-16 20:13:17'),
-(7, 'Cashier 1', 40.32, 4.32, 9.00, 1, '2025-10-16 20:19:03'),
-(8, 'Cashier 1', 87.36, 9.36, 0.00, 0, '2025-10-17 07:08:42'),
-(9, 'Cashier 1', 63.28, 6.78, 0.00, 0, '2025-10-18 19:00:29'),
-(10, 'Cashier 1', 224.00, 24.00, 50.00, 1, '2025-10-18 21:21:41'),
-(11, 'Cashier 1', 13.44, 1.44, 0.00, 0, '2025-10-18 21:27:15'),
-(12, 'Cashier 1', 515.20, 55.20, 0.00, 0, '2025-10-18 21:28:34'),
-(13, 'Cashier 1', 13.44, 1.44, 0.00, 0, '2025-10-18 21:39:10'),
-(14, 'Cashier 1', 32.26, 3.46, 7.20, 1, '2025-10-20 21:29:00'),
-(15, 'Cashier 1', 12.32, 1.32, 0.00, 0, '2025-10-20 21:42:03'),
-(16, 'Cashier 1', 13.44, 1.44, 0.00, 0, '2025-10-20 21:55:38'),
-(17, 'Cashier 1', 13.44, 1.44, 0.00, 0, '2025-10-20 22:42:22');
-
 -- --------------------------------------------------------
 
 --
@@ -146,37 +113,6 @@ CREATE TABLE `sale_items` (
   `total_price` decimal(12,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Dumping data for table `sale_items`
---
-
-INSERT INTO `sale_items` (`id`, `sale_id`, `product_id`, `name`, `quantity`, `unit_price`, `total_price`) VALUES
-(1, 1, 14, 'Band-Aid Assorted Strips (20s)', 1, 45.00, 45.00),
-(2, 1, 12, 'Appebon with Iron Capsule', 1, 11.00, 11.00),
-(3, 2, 14, 'Band-Aid Assorted Strips (20s)', 1, 45.00, 45.00),
-(4, 2, 12, 'Appebon with Iron Capsule', 1, 11.00, 11.00),
-(5, 3, 14, 'Band-Aid Assorted Strips (20s)', 1, 45.00, 45.00),
-(6, 3, 12, 'Appebon with Iron Capsule', 1, 11.00, 11.00),
-(7, 4, 14, 'Band-Aid Assorted Strips (20s)', 1, 45.00, 45.00),
-(8, 4, 12, 'Appebon with Iron Capsule', 1, 11.00, 11.00),
-(9, 5, 14, 'Band-Aid Assorted Strips (20s)', 1, 45.00, 45.00),
-(10, 5, 12, 'Appebon with Iron Capsule', 1, 11.00, 11.00),
-(11, 6, 14, 'Band-Aid Assorted Strips (20s)', 1, 45.00, 45.00),
-(12, 6, 12, 'Appebon with Iron Capsule', 1, 11.00, 11.00),
-(13, 7, 14, 'Band-Aid Assorted Strips (20s)', 1, 45.00, 45.00),
-(14, 8, 12, 'Appebon with Iron Capsule', 3, 11.00, 33.00),
-(15, 8, 14, 'Band-Aid Assorted Strips (20s)', 1, 45.00, 45.00),
-(16, 9, 3, 'Saridon Triple Action Tablet', 7, 7.00, 49.00),
-(17, 9, 9, 'Enervon C Tablet', 1, 7.50, 7.50),
-(18, 10, 21, 'Losartan (Cozaar) 50mg Tablet', 10, 25.00, 250.00),
-(19, 11, 2, 'Advil (Ibuprofen) 200mg Capsule', 1, 12.00, 12.00),
-(20, 12, 20, 'Amoxicillin 500mg Capsule', 46, 10.00, 460.00),
-(21, 13, 2, 'Advil (Ibuprofen) 200mg Capsule', 1, 12.00, 12.00),
-(22, 14, 2, 'Advil (Ibuprofen) 200mg Capsule', 3, 12.00, 36.00),
-(23, 15, 12, 'Appebon with Iron Capsule', 1, 11.00, 11.00),
-(24, 16, 2, 'Advil (Ibuprofen) 200mg Capsule', 1, 12.00, 12.00),
-(25, 17, 2, 'Advil (Ibuprofen) 200mg Capsule', 1, 12.00, 12.00);
-
 -- --------------------------------------------------------
 
 --
@@ -191,15 +127,6 @@ CREATE TABLE `stock_adjustments` (
   `created_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Dumping data for table `stock_adjustments`
---
-
-INSERT INTO `stock_adjustments` (`id`, `product_id`, `new_quantity`, `reason`, `created_at`) VALUES
-(1, 12, 120, 'Sale ID: 15', '2025-10-20 21:42:03'),
-(2, 2, 244, 'Sale ID: 16', '2025-10-20 21:55:38'),
-(3, 2, 243, 'Sale ID: 17', '2025-10-20 22:42:22');
-
 -- --------------------------------------------------------
 
 --
@@ -212,15 +139,6 @@ CREATE TABLE `stock_receipts` (
   `invoice_number` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `stock_receipts`
---
-
-INSERT INTO `stock_receipts` (`id`, `supplier`, `invoice_number`, `created_at`) VALUES
-(1, 'James Papio', '', '2025-10-18 21:17:19'),
-(2, 'haha', '', '2025-10-18 21:18:06'),
-(3, 'Lol', '', '2025-10-20 21:31:50');
 
 -- --------------------------------------------------------
 
@@ -235,15 +153,6 @@ CREATE TABLE `stock_receipt_items` (
   `quantity_received` int DEFAULT NULL,
   `purchase_price_at_time` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `stock_receipt_items`
---
-
-INSERT INTO `stock_receipt_items` (`id`, `receipt_id`, `product_id`, `quantity_received`, `purchase_price_at_time`) VALUES
-(1, 1, 2, 100, 9.50),
-(2, 2, 2, 1, 9.50),
-(3, 3, 20, 100, 8.00);
 
 -- --------------------------------------------------------
 
@@ -275,14 +184,6 @@ CREATE TABLE `users` (
   `full_name` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `username`, `password_hash`, `role`, `full_name`, `created_at`) VALUES
-(1, 'haha', '$2y$10$V7H/vNeCGY4v5gfVD/f1LeJRg1WTlA3pggOvUXv84enfWx7cLGcLW', 'staff', 'ludwig jose', '2025-10-14 22:20:15'),
-(4, 'hoho', '$2y$10$AcIkBVKRMSvPKt8yRpdIu.zBYlPtl540TNrR.yDLmin5FEItjSAae', 'owner', 'hoho', '2025-10-17 07:11:24');
 
 --
 -- Indexes for dumped tables
@@ -357,7 +258,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -369,31 +270,31 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `sales`
 --
 ALTER TABLE `sales`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `sale_items`
 --
 ALTER TABLE `sale_items`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `stock_adjustments`
 --
 ALTER TABLE `stock_adjustments`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `stock_receipts`
 --
 ALTER TABLE `stock_receipts`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `stock_receipt_items`
 --
 ALTER TABLE `stock_receipt_items`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `suppliers`
@@ -405,7 +306,7 @@ ALTER TABLE `suppliers`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables

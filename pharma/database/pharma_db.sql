@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 25, 2025 at 05:13 AM
+-- Generation Time: Oct 25, 2025 at 08:50 AM
 -- Server version: 8.0.41
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `pharma_db`
 --
+CREATE DATABASE IF NOT EXISTS `pharma_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE `pharma_db`;
 
 -- --------------------------------------------------------
 
@@ -52,34 +54,6 @@ CREATE TABLE `products` (
   `earliest_expiry_date` date DEFAULT NULL,
   `created_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `products`
---
-
-INSERT INTO `products` (`id`, `name`, `category`, `quantity`, `unit_price`, `purchase_price`, `supplier`, `earliest_expiry_date`, `created_at`) VALUES
-(1, 'Biogesic (Paracetamol) 500mg Tablet', 'Pain Relief', 200, 5.50, 4.00, 'Unilab, Inc.', '2027-12-31', '2025-10-16 14:58:48'),
-(2, 'Advil (Ibuprofen) 200mg Capsule', 'Pain Relief', 236, 12.00, 9.50, 'Pfizer', '2026-10-31', '2025-10-16 14:58:48'),
-(3, 'Saridon Triple Action Tablet', 'Pain Relief', 243, 7.00, 5.25, 'Bayer', '2027-08-31', '2025-10-16 14:58:48'),
-(4, 'Tempra Forte (Paracetamol) 250mg/5ml Syrup 60ml', 'Fever Relief', 80, 135.00, 110.00, 'Taisho', '2026-05-31', '2025-10-16 14:58:48'),
-(5, 'Solmux Forte (Carbocisteine) 500mg Capsule', 'Cough & Cold', 120, 15.00, 12.50, 'Unilab, Inc.', '2027-11-30', '2025-10-16 14:58:48'),
-(6, 'Neozep Forte (Phenylephrine HCl) Tablet', 'Cough & Cold', 300, 8.00, 6.50, 'Unilab, Inc.', '2028-01-31', '2025-10-16 14:58:48'),
-(7, 'Vicks Vaporub 25g', 'Cough & Cold', 90, 95.00, 80.00, 'Procter & Gamble', '2028-06-30', '2025-10-16 14:58:48'),
-(8, 'Strepsils Honey & Lemon Lozenge', 'Cough & Cold', 180, 10.00, 8.00, 'Reckitt Benckiser', '2026-09-30', '2025-10-16 14:58:48'),
-(9, 'Enervon C Tablet', 'Vitamins', 399, 7.50, 6.00, 'Unilab, Inc.', '2027-07-31', '2025-10-16 14:58:48'),
-(10, 'Centrum Advance Multivitamins', 'Vitamins', 75, 18.00, 15.00, 'GSK', '2026-11-30', '2025-10-16 14:58:48'),
-(11, 'Fern-C (Sodium Ascorbate) 500mg Capsule', 'Vitamins', 500, 9.00, 7.20, 'Fern, Inc.', '2027-04-30', '2025-10-16 14:58:48'),
-(12, 'Appebon with Iron Capsule', 'Supplements', 119, 11.00, 9.00, 'Unilab, Inc.', '2026-08-31', '2025-10-16 14:58:48'),
-(13, 'Betadine Antiseptic Solution 60ml', 'First Aid', 60, 150.00, 125.00, 'Mundipharma', '2028-02-29', '2025-10-16 14:58:48'),
-(14, 'Band-Aid Assorted Strips (20s)', 'First Aid', 92, 45.00, 35.00, 'Johnson & Johnson', '2029-01-31', '2025-10-16 14:58:48'),
-(15, 'Green Cross Isopropyl Alcohol 70% 250ml', 'First Aid', 110, 55.00, 45.00, 'Green Cross, Inc.', '2028-12-31', '2025-10-16 14:58:48'),
-(16, 'Cotton Balls (150s)', 'First Aid', 85, 35.00, 28.00, 'Generic Supplier', '2030-01-01', '2025-10-16 14:58:48'),
-(17, 'Cetaphil Gentle Skin Cleanser 250ml', 'Personal Care', 45, 450.00, 390.00, 'Galderma', '2027-06-30', '2025-10-16 14:58:48'),
-(18, 'Colgate Total Toothpaste 150g', 'Personal Care', 95, 130.00, 110.00, 'Colgate-Palmolive', '2027-03-31', '2025-10-16 14:58:48'),
-(19, 'Dove Bar Soap 100g', 'Personal Care', 150, 50.00, 42.00, 'Unilever', '2028-05-31', '2025-10-16 14:58:48'),
-(20, 'Amoxicillin 500mg Capsule', 'Antibiotics', 104, 10.00, 8.00, 'Generic Supplier', '2026-04-30', '2025-10-16 14:58:48'),
-(21, 'Losartan (Cozaar) 50mg Tablet', 'Hypertension', 55, 25.00, 20.00, 'MSD', '2027-09-30', '2025-10-16 14:58:48'),
-(22, 'Metformin 500mg Tablet', 'Diabetes', 80, 5.00, 3.50, 'Generic Supplier', '2027-10-31', '2025-10-16 14:58:48');
 
 -- --------------------------------------------------------
 
@@ -294,55 +268,55 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `product_batches`
 --
 ALTER TABLE `product_batches`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `sales`
 --
 ALTER TABLE `sales`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `sale_items`
 --
 ALTER TABLE `sale_items`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `stock_adjustments`
 --
 ALTER TABLE `stock_adjustments`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `stock_receipts`
 --
 ALTER TABLE `stock_receipts`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `stock_receipt_items`
 --
 ALTER TABLE `stock_receipt_items`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `suppliers`
 --
 ALTER TABLE `suppliers`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `users`

@@ -18,40 +18,66 @@ class ProductBatchEditorPage extends StatefulWidget {
 }
 
 class _ProductBatchEditorPageState extends State<ProductBatchEditorPage> {
+  late final Uri _listBatchesUri;
+  late final Uri _updateBatchUri;
+  late final Uri _deleteBatchUri;
+
   List<dynamic> _batches = [];
   bool _loading = false;
 
   @override
   void initState() {
     super.initState();
+
+    _listBatchesUri = Uri.parse('${ApiConfig.inventoryListBatches}?product_id=${widget.productId}');
+    _updateBatchUri = Uri.parse(ApiConfig.inventoryUpdateBatch);
+    _deleteBatchUri = Uri.parse(ApiConfig.inventoryDeleteBatch);
+
     _fetchBatches();
   }
 
   Future<void> _fetchBatches() async {
-    final messenger = ScaffoldMessenger.of(context); // capture synchronously
+    // --- FIX: Don't get messenger here ---
     setState(() => _loading = true);
     try {
-      final url = Uri.parse('${ApiConfig.inventoryListBatches}?product_id=${widget.productId}');
-      final res = await http.get(url, headers: {'X-API-KEY': 'local-dev-key'});
+      final res = await http.get(_listBatchesUri, headers: {'X-API-KEY': 'local-dev-key'});
 
       if (!mounted) return;
 
       if (res.statusCode == 200) {
-        final body = jsonDecode(res.body);
-        setState(() => _batches = body['data'] ?? []);
+        try {
+          final body = jsonDecode(res.body);
+          if (body is Map<String, dynamic> && body['data'] is List) {
+            setState(() {
+              _batches = List<dynamic>.from(body['data']);
+            });
+          } else {
+            setState(() => _batches = []);
+            // --- FIX: Get messenger only when needed ---
+            if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Received unexpected data from server.')));
+          }
+        } catch (e) {
+          setState(() => _batches = []);
+          // --- FIX: Get messenger only when needed ---
+          if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to parse server response: $e')));
+        }
       } else {
-        messenger.showSnackBar(SnackBar(content: Text('Failed to load batches: ${res.body}')));
+         setState(() => _batches = []);
+         // --- FIX: Get messenger only when needed ---
+         if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load batches: ${res.body}')));
       }
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+       setState(() => _batches = []);
+       // --- FIX: Get messenger only when needed ---
+       if (!mounted) return;
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
   Future<void> _updateBatch(String batchId, String newQty, String newExpiry) async {
-    final messenger = ScaffoldMessenger.of(context); // capture synchronously
+    // --- FIX: Don't get messenger here ---
     try {
       final payload = {
         'batch_id': batchId,
@@ -60,43 +86,50 @@ class _ProductBatchEditorPageState extends State<ProductBatchEditorPage> {
       };
 
       final res = await http.post(
-        Uri.parse(ApiConfig.inventoryUpdateBatch),
+        _updateBatchUri,
         headers: {'Content-Type': 'application/json', 'X-API-KEY': 'local-dev-key'},
         body: jsonEncode(payload),
       );
 
       if (!mounted) return;
       if (res.statusCode == 200) {
-        messenger.showSnackBar(const SnackBar(content: Text('Batch updated!')));
+        // --- FIX: Get messenger only when needed ---
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Batch updated!')));
         await _fetchBatches();
       } else {
-        messenger.showSnackBar(SnackBar(content: Text('Failed to update: ${res.body}')));
+        // --- FIX: Get messenger only when needed ---
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update: ${res.body}')));
       }
     } catch (e) {
       if (!mounted) return;
+      // --- FIX: Get messenger only when needed ---
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
   Future<void> _deleteBatch(String batchId) async {
-    final messenger = ScaffoldMessenger.of(context); // capture synchronously
+    // --- FIX: Don't get messenger here ---
     try {
       final payload = {'batch_id': batchId};
+
       final res = await http.post(
-        Uri.parse(ApiConfig.inventoryDeleteBatch),
+        _deleteBatchUri,
         headers: {'Content-Type': 'application/json', 'X-API-KEY': 'local-dev-key'},
         body: jsonEncode(payload),
       );
 
       if (!mounted) return;
       if (res.statusCode == 200) {
-        messenger.showSnackBar(const SnackBar(content: Text('Batch deleted!')));
-        await _fetchBatches(); // Refresh list
+        // --- FIX: Get messenger only when needed ---
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Batch deleted!')));
+        await _fetchBatches();
       } else {
-        messenger.showSnackBar(SnackBar(content: Text('Failed to delete: ${res.body}')));
+        // --- FIX: Get messenger only when needed ---
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete: ${res.body}')));
       }
     } catch (e) {
       if (!mounted) return;
+      // --- FIX: Get messenger only when needed ---
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
@@ -107,7 +140,7 @@ class _ProductBatchEditorPageState extends State<ProductBatchEditorPage> {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (context) => AlertDialog(
         title: Text('Edit Batch (ID: ${batch['id']})'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -130,11 +163,10 @@ class _ProductBatchEditorPageState extends State<ProductBatchEditorPage> {
         actions: [
           TextButton(
             onPressed: () async {
-              // capture navigator for this dialog synchronously to avoid using ctx after await
-              final parentNavigator = Navigator.of(ctx);
+              final parentNavigator = Navigator.of(context);
 
               final bool? confirm = await showDialog<bool>(
-                context: ctx,
+                context: context,
                 builder: (alertCtx) => AlertDialog(
                   title: const Text('Are you sure?'),
                   content: const Text('Do you want to permanently delete this batch?'),
@@ -153,10 +185,10 @@ class _ProductBatchEditorPageState extends State<ProductBatchEditorPage> {
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
           const Spacer(),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(ctx).pop();
+              Navigator.of(context).pop();
               _updateBatch(batch['id'].toString(), qtyController.text, expiryController.text);
             },
             child: const Text('Save'),
@@ -177,7 +209,7 @@ class _ProductBatchEditorPageState extends State<ProductBatchEditorPage> {
           : RefreshIndicator(
               onRefresh: _fetchBatches,
               child: _batches.isEmpty
-                  ? const Center(child: Text('No batches found for this product.'))
+                  ? Center(child: Text('No batches found for this product.(ID: ${widget.productId})'))
                   : ListView.builder(
                       padding: const EdgeInsets.all(12),
                       itemCount: _batches.length,
@@ -202,3 +234,4 @@ class _ProductBatchEditorPageState extends State<ProductBatchEditorPage> {
     );
   }
 }
+

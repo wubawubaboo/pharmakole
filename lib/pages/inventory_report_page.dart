@@ -4,13 +4,13 @@ import 'package:http/http.dart' as http;
 import '../api_config.dart';
 import 'inventory_alerts_page.dart';
 import 'adjustment_report_page.dart';
+
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-
 
 class InventoryReportPage extends StatefulWidget {
   const InventoryReportPage({super.key});
@@ -22,18 +22,21 @@ class InventoryReportPage extends StatefulWidget {
 class _InventoryReportPageState extends State<InventoryReportPage> {
   bool _loading = false;
   
-
+  // Summary Counts
   int _lowStockCount = 0;
   int _nearExpiryCount = 0;
   
-
+  // Data Lists
   List<dynamic> _lowStockItems = [];
   List<dynamic> _nearExpiryItems = [];
-  List<dynamic> _allMovements = [];
-  List<dynamic> _filteredMovements = [];
+  List<dynamic> _allMovements = []; // All movements from server
+  List<dynamic> _filteredMovements = []; // Movements filtered by date
 
- 
   DateTimeRange? _range;
+
+  // --- NEW: State for full export ---
+  bool _isExportingFullList = false;
+  // --- END NEW ---
 
   @override
   void initState() {
@@ -67,7 +70,6 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
 
     if (mounted) setState(() => _loading = false);
   }
-
 
   Future<void> _fetchSummaryCounts() async {
     try {
@@ -106,6 +108,7 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
         setState(() => _lowStockItems = body['low_stock'] ?? []);
       }
     } catch (e) {
+      // Fail silently
     }
   }
 
@@ -121,6 +124,7 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
         setState(() => _nearExpiryItems = body['near_expiry'] ?? []);
       }
     } catch (e) {
+      // Fail silently
     }
   }
   
@@ -135,7 +139,7 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
         final body = jsonDecode(res.body);
         setState(() {
           _allMovements = body['data'] ?? [];
-          _applyDateFilter();
+          _applyDateFilter(); // Apply the default filter
         });
       } else {
         ScaffoldMessenger.of(context)
@@ -200,7 +204,9 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
       MaterialPageRoute(builder: (_) => const AdjustmentReportPage()),
     ).then((_) => _fetchData());
   }
-  Future<void> _exportPDF() async {
+
+  // --- MODIFIED: Renamed to export SUMMARY ---
+  Future<void> _exportSummaryPDF() async {
     final pdf = pw.Document();
     final bold = pw.TextStyle(fontWeight: pw.FontWeight.bold);
     final header = pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold);
@@ -276,7 +282,8 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
     await Printing.layoutPdf(onLayout: (format) async => pdf.save());
   }
 
-  Future<void> _exportCSV() async {
+  // --- MODIFIED: Renamed to export SUMMARY ---
+  Future<void> _exportSummaryCSV() async {
     final rows = <List<dynamic>>[];
 
     rows.add(['Inventory Summary Report']);
@@ -343,6 +350,152 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
     }
   }
 
+  // --- NEW: Helper function to build section headers ---
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 16, 16, 8),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+    );
+  }
+
+  // --- NEW: Function to fetch and export the FULL inventory PDF ---
+  Future<void> _exportFullInventoryPDF() async {
+    setState(() => _isExportingFullList = true);
+    List<dynamic> itemsToExport = [];
+    
+    try {
+      // 1. Fetch full list
+      final url = Uri.parse(ApiConfig.inventoryList);
+      final res = await http.get(url, headers: {'X-API-KEY': 'local-dev-key'});
+      
+      if (!mounted) return;
+      if (res.statusCode == 200) {
+        itemsToExport = jsonDecode(res.body)['data'] ?? [];
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch full inventory: ${res.body}')));
+        setState(() => _isExportingFullList = false);
+        return;
+      }
+      
+      // 2. Build PDF
+      final pdf = pw.Document();
+      final header = pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold);
+      
+      pdf.addPage(pw.MultiPage(
+        build: (ctx) => [
+          pw.Text('Full Inventory Report', style: header),
+          pw.Text('Date: ${_formatDate(DateTime.now())}'),
+          pw.SizedBox(height: 8),
+          pw.TableHelper.fromTextArray(
+            headers: [
+              'ID',
+              'Name',
+              'Category',
+              'Qty',
+              'Unit Price',
+              'Purchase Price',
+              'Supplier',
+              'Expiry'
+            ],
+            data: itemsToExport.map((it) {
+              return [
+                it['id']?.toString() ?? 'N/A',
+                it['name'] ?? 'Unknown',
+                it['category'] ?? 'N/A',
+                it['quantity']?.toString() ?? '0',
+                '₱${(double.tryParse(it['unit_price'].toString()) ?? 0.0).toStringAsFixed(2)}',
+                '₱${(double.tryParse(it['purchase_price'].toString()) ?? 0.0).toStringAsFixed(2)}',
+                it['supplier'] ?? 'N/A',
+                it['earliest_expiry_date'] ?? 'N/A',
+              ];
+            }).toList(),
+          ),
+        ],
+      ));
+
+      await Printing.layoutPdf(onLayout: (format) async => pdf.save());
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error exporting PDF: $e')));
+    } finally {
+      if (mounted) setState(() => _isExportingFullList = false);
+    }
+  }
+
+  // --- NEW: Function to fetch and export the FULL inventory CSV ---
+  Future<void> _exportFullInventoryCSV() async {
+    setState(() => _isExportingFullList = true);
+    List<dynamic> itemsToExport = [];
+
+    try {
+      // 1. Fetch full list
+      final url = Uri.parse(ApiConfig.inventoryList);
+      final res = await http.get(url, headers: {'X-API-KEY': 'local-dev-key'});
+      
+      if (!mounted) return;
+      if (res.statusCode == 200) {
+        itemsToExport = jsonDecode(res.body)['data'] ?? [];
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to fetch full inventory: ${res.body}')));
+        setState(() => _isExportingFullList = false);
+        return;
+      }
+
+      // 2. Build CSV
+      final List<List<dynamic>> rows = [];
+      rows.add(['Full Inventory Report']);
+      rows.add(['Date:', _formatDate(DateTime.now())]);
+      rows.add([]);
+      
+      rows.add([
+        'ID',
+        'Name',
+        'Category',
+        'Quantity',
+        'Unit Price',
+        'Purchase Price',
+        'Supplier',
+        'Earliest Expiry'
+      ]);
+
+      for (final it in itemsToExport) {
+        rows.add([
+          it['id']?.toString() ?? 'N/A',
+          it['name'] ?? 'Unknown',
+          it['category'] ?? 'N/A',
+          it['quantity']?.toString() ?? '0',
+          (double.tryParse(it['unit_price'].toString()) ?? 0.0).toStringAsFixed(2),
+          (double.tryParse(it['purchase_price'].toString()) ?? 0.0).toStringAsFixed(2),
+          it['supplier'] ?? 'N/A',
+          it['earliest_expiry_date'] ?? 'N/A',
+        ]);
+      }
+
+      final csvStr = const ListToCsvConverter().convert(rows);
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File(
+          '${dir.path}/full_inventory_${DateTime.now().millisecondsSinceEpoch}.csv');
+      await file.writeAsString(csvStr);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('CSV saved to: ${file.path}'),
+        ));
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error exporting CSV: $e')));
+    } finally {
+      if (mounted) setState(() => _isExportingFullList = false);
+    }
+  }
+  // --- END NEW FUNCTIONS ---
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -351,18 +504,18 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_today),
-            tooltip: 'Select Date Range',
+            tooltip: 'Select Date Range for Movements',
             onPressed: _pickRange,
           ),
           IconButton(
             icon: const Icon(Icons.picture_as_pdf),
-            tooltip: 'Export as PDF',
-            onPressed: _loading ? null : _exportPDF,
+            tooltip: 'Export Summary as PDF',
+            onPressed: _loading ? null : _exportSummaryPDF,
           ),
           IconButton(
             icon: const Icon(Icons.file_download),
-            tooltip: 'Export as CSV',
-            onPressed: _loading ? null : _exportCSV,
+            tooltip: 'Export Summary as CSV',
+            onPressed: _loading ? null : _exportSummaryCSV,
           ),
         ],
       ),
@@ -373,15 +526,6 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
               child: ListView(
                 padding: const EdgeInsets.all(12),
                 children: [
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Text(
-                        'Showing movements for: ${_range != null ? _formatDate(_range!.start) : '...'} to ${_range != null ? _formatDate(_range!.end) : '...'}',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ),
-                  ),
                   Card(
                     color: _lowStockCount > 0 ? Colors.orange[50] : Colors.white,
                     child: ListTile(
@@ -390,7 +534,7 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.orange[900])),
-                      subtitle: Text('$_lowStockCount items need restocking.'),
+                      subtitle: Text('$_lowStockCount items need restocking (current).'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => _goToAlerts('low_stock'),
                     ),
@@ -405,15 +549,62 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
                               fontWeight: FontWeight.bold,
                               color: Colors.red[900])),
                       subtitle:
-                          Text('$_nearExpiryCount items expiring soon.'),
+                          Text('$_nearExpiryCount items expiring soon (current).'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => _goToAlerts('near_expiry'),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  
+                  // --- NEW SECTION FOR FULL EXPORT ---
+                  _buildSectionHeader(context, 'Full Inventory Export'),
+                  Card(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: _isExportingFullList
+                          ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(12.0),
+                                child: Column(
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    SizedBox(height: 8),
+                                    Text('Fetching full inventory...'),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton.icon(
+                                  icon: Icon(Icons.picture_as_pdf, color: Theme.of(context).colorScheme.primary),
+                                  label: const Text('Export PDF'),
+                                  onPressed: _exportFullInventoryPDF,
+                                ),
+                                TextButton.icon(
+                                  icon: Icon(Icons.file_download, color: Theme.of(context).colorScheme.primary),
+                                  label: const Text('Export CSV'),
+                                  onPressed: _exportFullInventoryCSV,
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
                   Text(
-                    'Stock Movements', // Title
+                    'Stock Movements',
                     style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Text(
+                        'Showing for: ${_range != null ? _formatDate(_range!.start) : '...'} to ${_range != null ? _formatDate(_range!.end) : '...'}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
                   ),
                   const Divider(),
                   if (_filteredMovements.isEmpty)
@@ -447,4 +638,3 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
     );
   }
 }
-

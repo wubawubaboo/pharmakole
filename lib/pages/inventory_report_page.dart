@@ -382,7 +382,6 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
                       ),
                     ),
                   ),
-                  // --- END NEW ---
                   Card(
                     color: _lowStockCount > 0 ? Colors.orange[50] : Colors.white,
                     child: ListTile(
@@ -391,7 +390,7 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.orange[900])),
-                      subtitle: Text('$_lowStockCount items need restocking (current).'),
+                      subtitle: Text('$_lowStockCount items need restocking.'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => _goToAlerts('low_stock'),
                     ),
@@ -406,7 +405,7 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
                               fontWeight: FontWeight.bold,
                               color: Colors.red[900])),
                       subtitle:
-                          Text('$_nearExpiryCount items expiring soon (current).'),
+                          Text('$_nearExpiryCount items expiring soon.'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => _goToAlerts('near_expiry'),
                     ),
@@ -448,3 +447,4 @@ class _InventoryReportPageState extends State<InventoryReportPage> {
     );
   }
 }
+

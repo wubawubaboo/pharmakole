@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import '../api_config.dart';
 
 class InventoryAlertsPage extends StatefulWidget {
-  final String alertType; // 'low_stock' or 'near_expiry'
+  final String alertType;
   const InventoryAlertsPage({super.key, required this.alertType});
 
   @override
@@ -78,7 +78,7 @@ class _InventoryAlertsPageState extends State<InventoryAlertsPage> {
                         if (widget.alertType == 'low_stock') {
                           subtitle = 'Quantity remaining: ${item['quantity']}';
                         } else {
-                          subtitle = 'Expires on: ${item['expiry_date']}';
+                          subtitle = 'Expires on: ${item['earliest_expiry_date']}';
                         }
                         return Card(
                           margin: const EdgeInsets.only(bottom: 8),
